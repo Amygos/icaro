@@ -1,29 +1,127 @@
-if: tag != autobuild
+stages:
+  - name: Compile
+    if: tag != autobuild
+  - name: Create DigitaOcean snapshots
+    if: tag IS present AND tag != autobuild
 
-matrix:
+jobs:
   include:
-    - language: go
+    - stage: Compile
+      language: go
       env:
         - NAME=sun-api
         - DEPLOY_FILES=sun/sun-api/sun-api
       script:
         - cd $TRAVIS_BUILD_DIR/sun/sun-api && go build
+      before_deploy:
+        - mkdir $TRAVIS_BUILD_DIR/deploy_files
+        - cd $TRAVIS_BUILD_DIR
+        - mv $DEPLOY_FILES $TRAVIS_BUILD_DIR/deploy_files/
+        - if test -z "$TRAVIS_TAG"; then  git tag -f autobuild; export TRAVIS_TAG=autobuild; else true; fi
+        - export ICARO_BUILD_DATE=$(echo Last autobuild $(date "+%c"))
+      deploy:
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            condition: $TRAVIS_BRANCH = "master"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+          overwrite: true
+          name: "Automatic build"
+          body: ${ICARO_BUILD_DATE}
+          prerelease: true
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            tags: true
+            condition: $TRAVIS_TAG != "autobuild"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+      after_deploy:
+        - if test "$TRAVIS_TAG" == "autobuild" -a "$TRAVIS_BRANCH" == "master" ; then git push -f https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG autobuild;  else true; fi
 
-    - language: go
+    - stage: Compile
+      language: go
       env:
         - NAME=sun-tasks
         - DEPLOY_FILES=sun/sun-tasks/sun-tasks
       script:
         - cd $TRAVIS_BUILD_DIR/sun/sun-tasks && go build
+      before_deploy:
+        - mkdir $TRAVIS_BUILD_DIR/deploy_files
+        - cd $TRAVIS_BUILD_DIR
+        - mv $DEPLOY_FILES $TRAVIS_BUILD_DIR/deploy_files/
+        - if test -z "$TRAVIS_TAG"; then  git tag -f autobuild; export TRAVIS_TAG=autobuild; else true; fi
+        - export ICARO_BUILD_DATE=$(echo Last autobuild $(date "+%c"))
+      deploy:
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            condition: $TRAVIS_BRANCH = "master"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+          overwrite: true
+          name: "Automatic build"
+          body: ${ICARO_BUILD_DATE}
+          prerelease: true
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            tags: true
+            condition: $TRAVIS_TAG != "autobuild"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+      after_deploy:
+        - if test "$TRAVIS_TAG" == "autobuild" -a "$TRAVIS_BRANCH" == "master" ; then git push -f https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG autobuild;  else true; fi
 
-    - language: go
+    - stage: Compile
+      language: go
       env:
         - NAME=wax
         - DEPLOY_FILES=wax/wax
       script:
         - cd $TRAVIS_BUILD_DIR/wax && go build
+      before_deploy:
+        - mkdir $TRAVIS_BUILD_DIR/deploy_files
+        - cd $TRAVIS_BUILD_DIR
+        - mv $DEPLOY_FILES $TRAVIS_BUILD_DIR/deploy_files/
+        - if test -z "$TRAVIS_TAG"; then  git tag -f autobuild; export TRAVIS_TAG=autobuild; else true; fi
+        - export ICARO_BUILD_DATE=$(echo Last autobuild $(date "+%c"))
+      deploy:
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            condition: $TRAVIS_BRANCH = "master"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+          overwrite: true
+          name: "Automatic build"
+          body: ${ICARO_BUILD_DATE}
+          prerelease: true
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            tags: true
+            condition: $TRAVIS_TAG != "autobuild"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+      after_deploy:
+        - if test "$TRAVIS_TAG" == "autobuild" -a "$TRAVIS_BRANCH" == "master" ; then git push -f https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG autobuild;  else true; fi
 
-    - language: node_js
+    - stage: Compile
+      language: node_js
       node_js: 8
       env:
         - NAME=sun-ui
@@ -32,9 +130,40 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/sun/sun-ui
         - npm install && npm run build
       after_success:
-        - cd dist && tar cvzf ../sun-ui.tar.gz .
+        - cd dist && tar cvzf ../sun-ui.tar.gz . 
+      before_deploy:
+        - mkdir $TRAVIS_BUILD_DIR/deploy_files
+        - cd $TRAVIS_BUILD_DIR
+        - mv $DEPLOY_FILES $TRAVIS_BUILD_DIR/deploy_files/
+        - if test -z "$TRAVIS_TAG"; then  git tag -f autobuild; export TRAVIS_TAG=autobuild; else true; fi
+        - export ICARO_BUILD_DATE=$(echo Last autobuild $(date "+%c"))
+      deploy:
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            condition: $TRAVIS_BRANCH = "master"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+          overwrite: true
+          name: "Automatic build"
+          body: ${ICARO_BUILD_DATE}
+          prerelease: true
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            tags: true
+            condition: $TRAVIS_TAG != "autobuild"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+      after_deploy:
+        - if test "$TRAVIS_TAG" == "autobuild" -a "$TRAVIS_BRANCH" == "master" ; then git push -f https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG autobuild;  else true; fi
 
-    - language: node_js
+    - stage: Compile
+      language: node_js
       node_js: 8
       env:
         - NAME=wings
@@ -44,8 +173,39 @@ matrix:
         - npm install && npm run build
       after_success:
         - cd dist/ && tar cvzf ../wings.tar.gz .
+      before_deploy:
+        - mkdir $TRAVIS_BUILD_DIR/deploy_files
+        - cd $TRAVIS_BUILD_DIR
+        - mv $DEPLOY_FILES $TRAVIS_BUILD_DIR/deploy_files/
+        - if test -z "$TRAVIS_TAG"; then  git tag -f autobuild; export TRAVIS_TAG=autobuild; else true; fi
+        - export ICARO_BUILD_DATE=$(echo Last autobuild $(date "+%c"))
+      deploy:
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            condition: $TRAVIS_BRANCH = "master"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+          overwrite: true
+          name: "Automatic build"
+          body: ${ICARO_BUILD_DATE}
+          prerelease: true
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            tags: true
+            condition: $TRAVIS_TAG != "autobuild"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+      after_deploy:
+        - if test "$TRAVIS_TAG" == "autobuild" -a "$TRAVIS_BRANCH" == "master" ; then git push -f https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG autobuild;  else true; fi
 
-    - language: minimal
+    - stage: Compile
+      language: minimal
       sevices:
         - docker
       env:
@@ -76,38 +236,85 @@ matrix:
       after_success:
         - docker commit makerpms nethserver/build
         - docker cp makerpms:/srv/makerpms/rpmbuild/RPMS/x86_64/ RPMS
-        - rsync  --exclude "dedalo-debuginfo-*"  RPMS/* dedalo.rpm
+        - rsync  --exclude "dedalo-debuginfo-*"  RPMS/* dedalo.rpm 
+      before_deploy:
+        - mkdir $TRAVIS_BUILD_DIR/deploy_files
+        - cd $TRAVIS_BUILD_DIR
+        - mv $DEPLOY_FILES $TRAVIS_BUILD_DIR/deploy_files/
+        - if test -z "$TRAVIS_TAG"; then  git tag -f autobuild; export TRAVIS_TAG=autobuild; else true; fi
+        - export ICARO_BUILD_DATE=$(echo Last autobuild $(date "+%c"))
+      deploy:
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            condition: $TRAVIS_BRANCH = "master"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+          overwrite: true
+          name: "Automatic build"
+          body: ${ICARO_BUILD_DATE}
+          prerelease: true
+        - provider: releases
+          api_key: ${GITHUB_TOKEN}
+          file_glob: true
+          skip_cleanup: true
+          on:
+            repo: ${TRAVIS_REPO_SLUG}
+            tags: true
+            condition: $TRAVIS_TAG != "autobuild"
+          file: ${TRAVIS_BUILD_DIR}/deploy_files/*
+      after_deploy:
+        - if test "$TRAVIS_TAG" == "autobuild" -a "$TRAVIS_BRANCH" == "master" ; then git push -f https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG autobuild;  else true; fi
 
-before_deploy:
-  - mkdir $TRAVIS_BUILD_DIR/deploy_files
-  - cd $TRAVIS_BUILD_DIR
-  - mv $DEPLOY_FILES $TRAVIS_BUILD_DIR/deploy_files/
-  - if test -z "$TRAVIS_TAG"; then  git tag -f autobuild; export TRAVIS_TAG=autobuild; else true; fi
-  - export ICARO_BUILD_DATE=$(echo Last autobuild $(date "+%c"))
+    - stage: Create DigitaOcean snapshots
+      language: python
+      env:
+        - NAME=icaro
+      script: true
+      before_deploy:
+        - pip install ansible
+        - wget https://releases.hashicorp.com/packer/1.2.1/packer_1.2.1_linux_amd64.zip -O ${TRAVIS_BUILD_DIR}/packer.zip
+        - cd ${TRAVIS_BUILD_DIR}
+        - unzip packer.zip
+      deploy:
+        provider: script
+        script: bash -c "cd ${TRAVIS_BUILD_DIR}/deploy && ${TRAVIS_BUILD_DIR}/packer build -only=${NAME} -var 'icaro_version=${TRAVIS_TAG}' -var 'icaro_url=https://github.com/${TRAVIS_REPO_SLUG}' ${TRAVIS_BUILD_DIR}/deploy/packer.json"
+        skip_cleanup: true
+        on:
+          tags: true
 
-deploy:
-  - provider: releases
-    api_key: ${GITHUB_TOKEN}
-    file_glob: true
-    skip_cleanup: true
-    on:
-      repo: ${TRAVIS_REPO_SLUG}
-      condition: $TRAVIS_BRANCH = "master"
-    file: ${TRAVIS_BUILD_DIR}/deploy_files/*
-    overwrite: true
-    name: "Automatic build"
-    body: ${ICARO_BUILD_DATE}
-    prerelease: true
+    - stage: Create DigitaOcean snapshots
+      language: python
+      env:
+        - NAME=sun
+      script: true
+      before_deploy:
+        - pip install ansible
+        - wget https://releases.hashicorp.com/packer/1.2.1/packer_1.2.1_linux_amd64.zip -O ${TRAVIS_BUILD_DIR}/packer.zip
+        - cd ${TRAVIS_BUILD_DIR}
+        - unzip packer.zip
+      deploy:
+        provider: script
+        script: bash -c "cd ${TRAVIS_BUILD_DIR}/deploy && ${TRAVIS_BUILD_DIR}/packer build -only=${NAME} -var 'icaro_version=${TRAVIS_TAG}' -var 'icaro_url=https://github.com/${TRAVIS_REPO_SLUG}' ${TRAVIS_BUILD_DIR}/deploy/packer.json"
+        skip_cleanup: true
+        on:
+          tags: true
 
-  - provider: releases
-    api_key: ${GITHUB_TOKEN}
-    file_glob: true
-    skip_cleanup: true
-    on:
-      repo: ${TRAVIS_REPO_SLUG}
-      tags: true
-      condition: $TRAVIS_TAG != "autobuild"
-    file: ${TRAVIS_BUILD_DIR}/deploy_files/*
-
-after_deploy:
-  - if test "$TRAVIS_TAG" == "autobuild" -a "$TRAVIS_BRANCH" == "master" ; then git push -f https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG autobuild;  else true; fi
+    - stage: Create DigitaOcean snapshots
+      language: python
+      env:
+        - NAME=wax
+      script: true
+      before_deploy:
+        - pip install ansible
+        - wget https://releases.hashicorp.com/packer/1.2.1/packer_1.2.1_linux_amd64.zip -O ${TRAVIS_BUILD_DIR}/packer.zip
+        - cd ${TRAVIS_BUILD_DIR}
+        - unzip packer.zip
+      deploy:
+        provider: script
+        script: bash -c "cd ${TRAVIS_BUILD_DIR}/deploy && ${TRAVIS_BUILD_DIR}/packer build -only=${NAME} -var 'icaro_version=${TRAVIS_TAG}' -var 'icaro_url=https://github.com/${TRAVIS_REPO_SLUG}' ${TRAVIS_BUILD_DIR}/deploy/packer.json"
+        skip_cleanup: true
+        on:
+          tags: true
