@@ -1,0 +1,4 @@
+meta_version: ‘0.1’  
+
+roles:
+  - path: deploy/ansible/roles/*
