@@ -5,29 +5,29 @@ matrix:
     - language: go
       env:
         - NAME=sun-api
-        - DEPLOY_FILES=sun/sun-api/sun-api
+        - DEPLOY_FILES="sun/sun-api/sun-api sun/sun-api/sun-api-race"
       script:
         - cp $TRAVIS_BUILD_DIR/wax/testdata/config.json $TRAVIS_BUILD_DIR/sun/sun-api
         - cp $TRAVIS_BUILD_DIR/wax/testdata/*png $TRAVIS_BUILD_DIR/sun/sun-api
-        - cd $TRAVIS_BUILD_DIR/sun/sun-api && go test
-        - cd $TRAVIS_BUILD_DIR/sun/sun-api && go build
+        - cd $TRAVIS_BUILD_DIR/sun/sun-api && go test && go test -race
+        - cd $TRAVIS_BUILD_DIR/sun/sun-api && go build && go build -race -o sun-api-race
 
     - language: go
       env:
         - NAME=sun-tasks
-        - DEPLOY_FILES=sun/sun-tasks/sun-tasks
+        - DEPLOY_FILES="sun/sun-tasks/sun-tasks sun/sun-tasks/sun-tasks-race"
       script:
-        - cd $TRAVIS_BUILD_DIR/sun/sun-tasks && go build
+        - cd $TRAVIS_BUILD_DIR/sun/sun-tasks && go build && go build -race -o sun-tasks-race
 
     - language: go
       env:
         - NAME=wax
-        - DEPLOY_FILES=wax/wax
+        - DEPLOY_FILES="wax/wax wax/wax-race"
       script:
         - cp $TRAVIS_BUILD_DIR/wax/testdata/config.json $TRAVIS_BUILD_DIR/wax
         - cp $TRAVIS_BUILD_DIR/wax/testdata/*png $TRAVIS_BUILD_DIR/wax
-        - cd $TRAVIS_BUILD_DIR/wax && go test
-        - cd $TRAVIS_BUILD_DIR/wax && go build
+        - cd $TRAVIS_BUILD_DIR/wax && go test && go test -race
+        - cd $TRAVIS_BUILD_DIR/wax && go build && go build -race -o wax-race
 
     - language: node_js
       node_js: 8
