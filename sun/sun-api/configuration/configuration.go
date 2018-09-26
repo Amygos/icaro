@@ -37,11 +37,13 @@ import (
 
 type Configuration struct {
 	Database struct {
-		Host     string `json:"host"`
-		Port     string `json:"port"`
-		User     string `json:"user"`
-		Name     string `json:"name"`
-		Password string `json:"password"`
+		Host         string `json:"host"`
+		Port         string `json:"port"`
+		User         string `json:"user"`
+		Name         string `json:"name"`
+		Password     string `json:"password"`
+		MaxOpenConns int    `json:"max_open_conns"`
+		MaxIdleConns int    `json:"max_idle_conns"`
 	} `json:"database"`
 	AuthSocial       models.AuthSocial `json:"auth_social"`
 	TokenExpiresDays int               `json:"token_expires_days"`
@@ -98,6 +100,12 @@ func Init(ConfigFilePtr *string) {
 	}
 	if os.Getenv("DB_NAME") != "" {
 		Config.Database.Name = os.Getenv("DB_NAME")
+	}
+	if os.Getenv("DB_NAME_MAX_OPEN_CONNS") != "" {
+		Config.Database.MaxOpenConns, _ = strconv.Atoi(os.Getenv("DB_NAME_MAX_OPEN_CONNS"))
+	}
+	if os.Getenv("DB_NAME_MAX_IDLE_CONNS") != "" {
+		Config.Database.MaxIdleConns, _ = strconv.Atoi(os.Getenv("DB_NAME_MAX_IDLE_CONNS"))
 	}
 
 	if os.Getenv("CORS_ORIGINS") != "" {

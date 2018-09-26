@@ -4,7 +4,9 @@
         "port":"3306",
         "name":"icaro",
         "user": "{{ icaro.wax.db_username }}",
-        "password": "{{ icaro.wax.db_password }}"
+        "password": "{{ icaro.wax.db_password }}",
+        "max_open_conns": "{{ icaro.sun_api.db_max_open_conns | default('0') }}",
+        "max_idle_conns": "{{ icaro.sun_api.db_max_idle_conns | default('0') }}"
     },
     "token_expires_days": 1,
     "cors": {

@@ -45,5 +45,9 @@ func Init() *gorm.DB {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	db.DB().SetMaxOpenConns(configuration.Config.Database.MaxOpenConns)
+	db.DB().SetMaxOpenConns(configuration.Config.Database.MaxIdleConns)
+
 	return db
 }
