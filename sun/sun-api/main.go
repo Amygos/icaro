@@ -126,6 +126,9 @@ func DefineAPI(router *gin.Engine) {
 			smsStats.POST("/accounts/:account_id", methods.UpdateSMSTotalForAccount)
 			smsStats.GET("/hotspots", methods.StatsSMSTotalSentForHotspot)
 			smsStats.GET("/hotspots/:hotspot_id", methods.StatsSMSTotalSentForHotspotByHotspot)
+
+			reports := stats.Group("/reports/")
+			reports.GET("/current/sessions", methods.ReportsCurrentSessions)
 		}
 
 		units := api.Group("/units")
